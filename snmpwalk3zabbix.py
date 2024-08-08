@@ -2,7 +2,7 @@ import sys
 import os
 import re
 import uuid
-import subprocess
+import subprocess 
 
 if len(sys.argv) < 6:
     print(
@@ -16,7 +16,7 @@ else:
     snmpwalk_command = f'snmpwalk -v 3 -l authPriv -u {USERNAME} -a SHA1 -A {AUTHPASSPHRASE} -x AES128 -X {PRIVPASSPHRASE} {IP} {BASE_OID}'
     process = subprocess.Popen(snmpwalk_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
     stdout, stderr = process.communicate()
-
+    
     OIDSRESPONSE = stdout.decode('utf-8', 'ignore')
 
     print("Processing " + str(len(OIDS)) + " rows")
