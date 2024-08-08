@@ -13,12 +13,10 @@ else:
     IP = sys.argv[4]
     BASE_OID = sys.argv[5] if len(sys.argv) == 6 else "."
     snmpwalk_command = f'snmpwalk -v 3 -l authPriv -u {USERNAME} -a SHA1 -A {AUTHPASSPHRASE} -x AES128 -X {PRIVPASSPHRASE} {IP} {BASE_OID}'
-    OIDSRESPONSE = os.popen(snmpwalk_command).read()
-    if "<!DOCTYPE html>" in OIDSRESPONSE:
-        print("Error: La respuesta contiene HTML, lo que sugiere que el comando SNMP falló. Verifique sus credenciales SNMPv3 y la configuración del dispositivo.")
-        sys.exit(1)
+    process = subprocess.Popen(snmpwalk_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
+    stdout, stderr = process.communicate()
 
-    OIDS = OIDSRESPONSE.split("\n")
+    OIDSRESPONSE = stdout.decode('utf-8', 'ignore')
 
     print("Processing " + str(len(OIDS)) + " rows")
 
