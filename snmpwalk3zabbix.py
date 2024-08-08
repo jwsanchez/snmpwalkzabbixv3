@@ -12,14 +12,8 @@ else:
     PRIVPASSPHRASE = sys.argv[3]
     IP = sys.argv[4]
     BASE_OID = sys.argv[5] if len(sys.argv) == 6 else "."
-
-    # Construir el comando SNMP
-    snmpwalk_command = f'snmpwalk -v 3 -l authPriv -u {USERNAME} -a SHA -A {AUTHPASSPHRASE} -x AES -X {PRIVPASSPHRASE} {IP} {BASE_OID}'
-
-    # Ejecutar el comando SNMP y capturar la salida
+    snmpwalk_command = f'snmpwalk -v 3 -l authPriv -u {USERNAME} -a SHA1 -A {AUTHPASSPHRASE} -x AES128 -X {PRIVPASSPHRASE} {IP} {BASE_OID}'
     OIDSRESPONSE = os.popen(snmpwalk_command).read()
-
-    # Verificar si la respuesta contiene una página HTML, lo cual indicaría un error
     if "<!DOCTYPE html>" in OIDSRESPONSE:
         print("Error: La respuesta contiene HTML, lo que sugiere que el comando SNMP falló. Verifique sus credenciales SNMPv3 y la configuración del dispositivo.")
         sys.exit(1)
