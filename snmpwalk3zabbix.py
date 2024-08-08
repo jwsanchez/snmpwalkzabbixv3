@@ -3,9 +3,9 @@ import os
 import re
 import uuid
 
-if len(sys.argv) < 7:
+if len(sys.argv) < 6:
     print(
-        "Usage: python snmpwalk2zabbix.py \x1B[3mUsername\x1B[23m \x1B[3mAuthPassphrase\x1B[23m \x1B[3mPrivPassphrase\x1B[23m \x1B[3mIP-Address\x1B[23m \x1B[3mBase-OID\x1B[23m\neg,\npython snmpwalk2zabbix.py myuser authpass privpass 127.0.0.1 1.3.6.1.2.1.1")
+        "Usage: python snmpwalk3zabbix.py \x1B[3mUsername\x1B[23m \x1B[3mAuthPassphrase\x1B[23m \x1B[3mPrivPassphrase\x1B[23m \x1B[3mIP-Address\x1B[23m \x1B[3mBase-OID\x1B[23m\neg,\npython snmpwalk3zabbix.py myuser authpass privpass 127.0.0.1 1.3.6.1.2.1.1")
 else:
     USERNAME = sys.argv[1]
     AUTHPASSPHRASE = sys.argv[2]
@@ -13,8 +13,16 @@ else:
     IP = sys.argv[4]
     BASE_OID = sys.argv[5] if len(sys.argv) == 6 else "."
 
-    OIDSRESPONSE = os.popen('snmpwalk -v 3 -l authPriv -u ' + USERNAME +
-                            ' -a SHA -A ' + AUTHPASSPHRASE + ' -x AES -X ' + PRIVPASSPHRASE + ' ' + IP + ' ' + BASE_OID).read()
+    # Construir el comando SNMP
+    snmpwalk_command = f'snmpwalk -v 3 -l authPriv -u {USERNAME} -a SHA -A {AUTHPASSPHRASE} -x AES -X {PRIVPASSPHRASE} {IP} {BASE_OID}'
+
+    # Ejecutar el comando SNMP y capturar la salida
+    OIDSRESPONSE = os.popen(snmpwalk_command).read()
+
+    # Verificar si la respuesta contiene una página HTML, lo cual indicaría un error
+    if "<!DOCTYPE html>" in OIDSRESPONSE:
+        print("Error: La respuesta contiene HTML, lo que sugiere que el comando SNMP falló. Verifique sus credenciales SNMPv3 y la configuración del dispositivo.")
+        sys.exit(1)
 
     OIDS = OIDSRESPONSE.split("\n")
 
